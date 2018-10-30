@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Simple_Blue" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6c6ed8f6-c446-4778-9acb-18f983bacd83">
+	<parameter name="title" class="java.lang.String"/>
+	<field name="tail_num" class="java.lang.String"/>
+	<field name="aircraft_serial" class="java.lang.String"/>
+	<field name="aircraft_model" class="java.lang.String"/>
+	<field name="engine_model" class="java.lang.String"/>
+	<title>
+		<band height="202">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="-20" width="595" height="92" backcolor="#FF6699" uuid="be4866da-84ff-447d-baa8-14e0c405fd0a"/>
+				<staticText>
+					<reportElement x="20" y="20" width="234" height="43" forecolor="#FFFFFF" uuid="61acf03f-dcd2-4528-b39c-d6dae8c0050f"/>
+					<textElement>
+						<font size="34" isBold="true"/>
+					</textElement>
+					<text><![CDATA[TITLE11]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="295" y="43" width="280" height="20" forecolor="#FFFFFF" uuid="fdff15fe-6520-4618-b11a-117f32ef4001"/>
+					<textElement textAlignment="Right">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Add a description here blbaldskdfs]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21">
+			<line>
+				<reportElement x="-20" y="20" width="595" height="1" forecolor="#666666" uuid="173c0bd4-93bd-4c53-aa3a-4c5b860c4468"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40">
+			<textField>
+				<reportElement x="0" y="0" width="64" height="30" forecolor="#FF0000" uuid="fdff15fe-6520-4618-b11a-117f32ef4002"/>
+				<textFieldExpression class="java.lang.String">
+					<![CDATA[$F{tail_num}]]>
+				</textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="17">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" uuid="8a9c96f6-fc18-4ea9-bc02-c92811ebb5b0"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" uuid="8fa9e394-fe54-4018-9f67-faca5e1887f7"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="yyyy">
+				<reportElement x="0" y="4" width="100" height="13" uuid="6367a175-f5e2-4450-b662-4179a2282d92"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>
