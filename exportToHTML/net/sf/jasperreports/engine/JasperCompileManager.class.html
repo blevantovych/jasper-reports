@@ -1,0 +1,349 @@
+<html>
+<head>
+<title>JasperCompileManager.class</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+JasperCompileManager.class</font>
+</center></td></tr></table>
+<pre><span class="s0">//</span>
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+<span class="s2">package </span><span class="s1">net.sf.jasperreports.engine</span><span class="s2">;</span>
+
+import <span class="s1">java.io.File</span><span class="s2">;</span>
+import <span class="s1">java.io.InputStream</span><span class="s2">;</span>
+import <span class="s1">java.io.OutputStream</span><span class="s2">;</span>
+import <span class="s1">java.lang.reflect.Constructor</span><span class="s2">;</span>
+import <span class="s1">java.util.Collection</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.crosstabs.JRCrosstab</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRCompiler</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRJavacCompiler</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRJdk13Compiler</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRJdtCompiler</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRValidationFault</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JRVerifier</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.design.JasperDesign</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.fill.JREvaluator</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.fill.JasperReportsContextAware</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.util.JRClassLoader</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.util.JRLoader</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.util.JRSaver</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.xml.JRXmlLoader</span><span class="s2">;</span>
+import <span class="s1">net.sf.jasperreports.engine.xml.JRXmlWriter</span><span class="s2">;</span>
+
+public final class <span class="s1">JasperCompileManager {</span>
+    <span class="s2">public static final </span><span class="s1">String EXCEPTION_MESSAGE_KEY_INSTANTIATE_REPORT_COMPILER_FAILURE = </span><span class="s3">&quot;engine.instantiate.report.compiler.failure&quot;</span><span class="s2">;</span>
+    public static final <span class="s1">String EXCEPTION_MESSAGE_KEY_REPORT_COMPILER_CLASS_NOT_FOUND = </span><span class="s3">&quot;engine.report.compiler.class.not.found&quot;</span><span class="s2">;</span>
+    public static final <span class="s1">String EXCEPTION_MESSAGE_KEY_REPORT_COMPILER_NOT_SET = </span><span class="s3">&quot;engine.report.compiler.not.set&quot;</span><span class="s2">;</span>
+    private <span class="s1">JasperReportsContext jasperReportsContext</span><span class="s2">;</span>
+
+    private <span class="s1">JasperCompileManager(JasperReportsContext jasperReportsContext) {</span>
+        <span class="s2">this</span><span class="s1">.jasperReportsContext = jasperReportsContext</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">private static </span><span class="s1">JasperCompileManager getDefaultInstance() {</span>
+        <span class="s2">return new </span><span class="s1">JasperCompileManager(DefaultJasperReportsContext.getInstance())</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JasperCompileManager getInstance(JasperReportsContext jasperReportsContext) {</span>
+        <span class="s2">return new </span><span class="s1">JasperCompileManager(jasperReportsContext)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">String compileToFile(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        File sourceFile = <span class="s2">new </span><span class="s1">File(sourceFileName)</span><span class="s2">;</span>
+        <span class="s1">JasperDesign jasperDesign = JRXmlLoader.load(sourceFileName)</span><span class="s2">;</span>
+        <span class="s1">File destFile = </span><span class="s2">new </span><span class="s1">File(sourceFile.getParent()</span><span class="s2">, </span><span class="s1">jasperDesign.getName() + </span><span class="s3">&quot;.jasper&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">String destFileName = destFile.toString()</span><span class="s2">;</span>
+        this<span class="s1">.compileToFile(jasperDesign</span><span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+        return <span class="s1">destFileName</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">compileToFile(String sourceFileName</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperDesign jasperDesign = JRXmlLoader.load(sourceFileName)<span class="s2">;</span>
+        this<span class="s1">.compileToFile(jasperDesign</span><span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">compileToFile(JasperDesign jasperDesign</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperReport jasperReport = <span class="s2">this</span><span class="s1">.compile(jasperDesign)</span><span class="s2">;</span>
+        <span class="s1">JRSaver.saveObject(jasperReport</span><span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JasperReport compile(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperDesign jasperDesign = JRXmlLoader.load(sourceFileName)<span class="s2">;</span>
+        return this<span class="s1">.compile(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">compileToStream(InputStream inputStream</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream)<span class="s2">;</span>
+        this<span class="s1">.compileToStream(jasperDesign</span><span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">compileToStream(JasperDesign jasperDesign</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperReport jasperReport = <span class="s2">this</span><span class="s1">.compile(jasperDesign)</span><span class="s2">;</span>
+        <span class="s1">JRSaver.saveObject(jasperReport</span><span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JasperReport compile(InputStream inputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream)<span class="s2">;</span>
+        return this<span class="s1">.compile(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JasperReport compile(JasperDesign jasperDesign) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return this</span><span class="s1">.getCompiler(jasperDesign).compileReport(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">Collection&lt;JRValidationFault&gt; verify(JasperDesign jasperDesign) {</span>
+        <span class="s2">return </span><span class="s1">JRVerifier.verifyDesign(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JREvaluator getEvaluator(JasperReport jasperReport</span><span class="s2">, </span><span class="s1">JRDataset dataset) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRCompiler compiler = <span class="s2">this</span><span class="s1">.getCompiler(jasperReport)</span><span class="s2">;</span>
+        <span class="s1">JREvaluator evaluator = compiler.loadEvaluator(jasperReport</span><span class="s2">, </span><span class="s1">dataset)</span><span class="s2">;</span>
+        this<span class="s1">.initialize(evaluator)</span><span class="s2">;</span>
+        return <span class="s1">evaluator</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JREvaluator getEvaluator(JasperReport jasperReport</span><span class="s2">, </span><span class="s1">JRCrosstab crosstab) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRCompiler compiler = <span class="s2">this</span><span class="s1">.getCompiler(jasperReport)</span><span class="s2">;</span>
+        <span class="s1">JREvaluator evaluator = compiler.loadEvaluator(jasperReport</span><span class="s2">, </span><span class="s1">crosstab)</span><span class="s2">;</span>
+        this<span class="s1">.initialize(evaluator)</span><span class="s2">;</span>
+        return <span class="s1">evaluator</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">JREvaluator getEvaluator(JasperReport jasperReport) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return this</span><span class="s1">.getEvaluator(jasperReport</span><span class="s2">, </span><span class="s1">jasperReport.getMainDataset())</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">protected void </span><span class="s1">initialize(JREvaluator evaluator) {</span>
+        <span class="s2">if </span><span class="s1">(evaluator </span><span class="s2">instanceof </span><span class="s1">JasperReportsContextAware) {</span>
+            ((JasperReportsContextAware)evaluator).setJasperReportsContext(<span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+    }
+
+    <span class="s2">public </span><span class="s1">String writeToXmlFile(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        File sourceFile = <span class="s2">new </span><span class="s1">File(sourceFileName)</span><span class="s2">;</span>
+        <span class="s1">JRReport report = (JRReport)JRLoader.loadObject(sourceFile)</span><span class="s2">;</span>
+        <span class="s1">File destFile = </span><span class="s2">new </span><span class="s1">File(sourceFile.getParent()</span><span class="s2">, </span><span class="s1">report.getName() + </span><span class="s3">&quot;.jasper.jrxml&quot;</span><span class="s1">)</span><span class="s2">;</span>
+        <span class="s1">String destFileName = destFile.toString()</span><span class="s2">;</span>
+        this<span class="s1">.writeToXmlFile(report</span><span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+        return <span class="s1">destFileName</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">writeToXmlFile(String sourceFileName</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRReport report = (JRReport)JRLoader.loadObjectFromFile(sourceFileName)<span class="s2">;</span>
+        this<span class="s1">.writeToXmlFile(report</span><span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">writeToXmlFile(JRReport report</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        (<span class="s2">new </span><span class="s1">JRXmlWriter(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)).write(report</span><span class="s2">, </span><span class="s1">destFileName</span><span class="s2">, </span><span class="s3">&quot;UTF-8&quot;</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">writeToXmlStream(InputStream inputStream</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRReport report = (JRReport)JRLoader.loadObject(inputStream)<span class="s2">;</span>
+        this<span class="s1">.writeToXmlStream(report</span><span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public void </span><span class="s1">writeToXmlStream(JRReport report</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        (<span class="s2">new </span><span class="s1">JRXmlWriter(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)).write(report</span><span class="s2">, </span><span class="s1">outputStream</span><span class="s2">, </span><span class="s3">&quot;UTF-8&quot;</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public </span><span class="s1">String writeToXml(JRReport report) {</span>
+        <span class="s2">return </span><span class="s1">(</span><span class="s2">new </span><span class="s1">JRXmlWriter(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)).write(report</span><span class="s2">, </span><span class="s3">&quot;UTF-8&quot;</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">String compileReportToFile(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().compileToFile(sourceFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">compileReportToFile(String sourceFileName</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().compileToFile(sourceFileName<span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">compileReportToFile(JasperDesign jasperDesign</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().compileToFile(jasperDesign<span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JasperReport compileReport(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().compile(sourceFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">compileReportToStream(InputStream inputStream</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().compileToStream(inputStream<span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">compileReportToStream(JasperDesign jasperDesign</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().compileToStream(jasperDesign<span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JasperReport compileReport(InputStream inputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().compile(inputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JasperReport compileReport(JasperDesign jasperDesign) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().compile(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">Collection&lt;JRValidationFault&gt; verifyDesign(JasperDesign jasperDesign) {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().verify(jasperDesign)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JREvaluator loadEvaluator(JasperReport jasperReport</span><span class="s2">, </span><span class="s1">JRDataset dataset) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().getEvaluator(jasperReport</span><span class="s2">, </span><span class="s1">dataset)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JREvaluator loadEvaluator(JasperReport jasperReport</span><span class="s2">, </span><span class="s1">JRCrosstab crosstab) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().getEvaluator(jasperReport</span><span class="s2">, </span><span class="s1">crosstab)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">JREvaluator loadEvaluator(JasperReport jasperReport) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().getEvaluator(jasperReport)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">String writeReportToXmlFile(String sourceFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().writeToXmlFile(sourceFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">writeReportToXmlFile(String sourceFileName</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().writeToXmlFile(sourceFileName<span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">writeReportToXmlFile(JRReport report</span><span class="s2">, </span><span class="s1">String destFileName) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().writeToXmlFile(report<span class="s2">, </span><span class="s1">destFileName)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">writeReportToXmlStream(InputStream inputStream</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().writeToXmlStream(inputStream<span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static void </span><span class="s1">writeReportToXmlStream(JRReport report</span><span class="s2">, </span><span class="s1">OutputStream outputStream) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        getDefaultInstance().writeToXmlStream(report<span class="s2">, </span><span class="s1">outputStream)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">public static </span><span class="s1">String writeReportToXml(JRReport report) {</span>
+        <span class="s2">return </span><span class="s1">getDefaultInstance().writeToXml(report)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">private </span><span class="s1">JRCompiler getJavaCompiler() {</span>
+        Object compiler = <span class="s2">null;</span>
+
+        try <span class="s1">{</span>
+            JRClassLoader.loadClassForRealName(<span class="s3">&quot;org.eclipse.jdt.internal.compiler.Compiler&quot;</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">compiler = </span><span class="s2">new </span><span class="s1">JRJdtCompiler(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(Exception var4) {</span>
+            <span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s2">if </span><span class="s1">(compiler == </span><span class="s2">null</span><span class="s1">) {</span>
+            <span class="s2">try </span><span class="s1">{</span>
+                JRClassLoader.loadClassForRealName(<span class="s3">&quot;com.sun.tools.javac.Main&quot;</span><span class="s1">)</span><span class="s2">;</span>
+                <span class="s1">compiler = </span><span class="s2">new </span><span class="s1">JRJdk13Compiler(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+            <span class="s1">} </span><span class="s2">catch </span><span class="s1">(Exception var3) {</span>
+                <span class="s2">;</span>
+            <span class="s1">}</span>
+        }
+
+        <span class="s2">if </span><span class="s1">(compiler == </span><span class="s2">null</span><span class="s1">) {</span>
+            compiler = <span class="s2">new </span><span class="s1">JRJavacCompiler(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+
+        <span class="s2">return </span><span class="s1">(JRCompiler)compiler</span><span class="s2">;</span>
+    <span class="s1">}</span>
+
+    <span class="s2">private </span><span class="s1">JRCompiler getCompiler(JasperReport jasperReport) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRCompiler compiler = <span class="s2">null;</span>
+        <span class="s1">String compilerClassName = jasperReport.getCompilerClass()</span><span class="s2">;</span>
+        <span class="s1">Class&lt;? </span><span class="s2">extends </span><span class="s1">JRCompiler&gt; compilerClass = </span><span class="s2">null;</span>
+        <span class="s1">ClassLoader classLoader = Thread.currentThread().getContextClassLoader()</span><span class="s2">;</span>
+        <span class="s1">Class tmpCompilerClass</span><span class="s2">;</span>
+        if <span class="s1">(classLoader != </span><span class="s2">null</span><span class="s1">) {</span>
+            <span class="s2">try </span><span class="s1">{</span>
+                tmpCompilerClass = classLoader.loadClass(compilerClassName)<span class="s2">;</span>
+                <span class="s1">compilerClass = tmpCompilerClass</span><span class="s2">;</span>
+            <span class="s1">} </span><span class="s2">catch </span><span class="s1">(ClassNotFoundException var9) {</span>
+                <span class="s2">;</span>
+            <span class="s1">}</span>
+        }
+
+        <span class="s2">if </span><span class="s1">(compilerClass == </span><span class="s2">null</span><span class="s1">) {</span>
+            classLoader = JasperCompileManager.<span class="s2">class</span><span class="s1">.getClassLoader()</span><span class="s2">;</span>
+
+            try <span class="s1">{</span>
+                <span class="s2">if </span><span class="s1">(classLoader == </span><span class="s2">null</span><span class="s1">) {</span>
+                    tmpCompilerClass = Class.forName(compilerClassName)<span class="s2">;</span>
+                    <span class="s1">compilerClass = tmpCompilerClass</span><span class="s2">;</span>
+                <span class="s1">} </span><span class="s2">else </span><span class="s1">{</span>
+                    tmpCompilerClass = classLoader.loadClass(compilerClassName)<span class="s2">;</span>
+                    <span class="s1">compilerClass = tmpCompilerClass</span><span class="s2">;</span>
+                <span class="s1">}</span>
+            } <span class="s2">catch </span><span class="s1">(ClassNotFoundException var8) {</span>
+                <span class="s2">throw new </span><span class="s1">JRException(</span><span class="s3">&quot;engine.report.compiler.class.not.found&quot;</span><span class="s2">, new </span><span class="s1">Object[]{compilerClassName}</span><span class="s2">, </span><span class="s1">var8)</span><span class="s2">;</span>
+            <span class="s1">}</span>
+        }
+
+        <span class="s2">try </span><span class="s1">{</span>
+            Constructor&lt;? <span class="s2">extends </span><span class="s1">JRCompiler&gt; constructor = compilerClass.getConstructor(JasperReportsContext.</span><span class="s2">class</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">compiler = (JRCompiler)constructor.newInstance(</span><span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+            return <span class="s1">compiler</span><span class="s2">;</span>
+        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(Exception var7) {</span>
+            <span class="s2">throw new </span><span class="s1">JRException(</span><span class="s3">&quot;engine.instantiate.report.compiler.failure&quot;</span><span class="s2">, new </span><span class="s1">Object[]{compilerClassName}</span><span class="s2">, </span><span class="s1">var7)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    }
+
+    <span class="s2">private </span><span class="s1">JRCompiler getCompiler(JasperDesign jasperDesign) </span><span class="s2">throws </span><span class="s1">JRException {</span>
+        JRCompiler compiler = <span class="s2">null;</span>
+        <span class="s1">String compilerClassName = </span><span class="s2">this</span><span class="s1">.getCompilerClassProperty()</span><span class="s2">;</span>
+        if <span class="s1">(compilerClassName == </span><span class="s2">null </span><span class="s1">|| compilerClassName.trim().length() == </span><span class="s4">0</span><span class="s1">) {</span>
+            String language = jasperDesign.getLanguage()<span class="s2">;</span>
+            <span class="s1">compilerClassName = JRPropertiesUtil.getInstance(</span><span class="s2">this</span><span class="s1">.jasperReportsContext).getProperty(</span><span class="s3">&quot;net.sf.jasperreports.compiler.&quot; </span><span class="s1">+ language)</span><span class="s2">;</span>
+            if <span class="s1">(compilerClassName == </span><span class="s2">null </span><span class="s1">|| compilerClassName.trim().length() == </span><span class="s4">0</span><span class="s1">) {</span>
+                <span class="s2">if </span><span class="s1">(</span><span class="s3">&quot;java&quot;</span><span class="s1">.equals(language)) {</span>
+                    <span class="s2">return this</span><span class="s1">.getJavaCompiler()</span><span class="s2">;</span>
+                <span class="s1">}</span>
+
+                <span class="s2">throw new </span><span class="s1">JRException(</span><span class="s3">&quot;engine.report.compiler.not.set&quot;</span><span class="s2">, new </span><span class="s1">Object[]{language})</span><span class="s2">;</span>
+            <span class="s1">}</span>
+        }
+
+        <span class="s2">try </span><span class="s1">{</span>
+            Class clazz = JRClassLoader.loadClassForName(compilerClassName)<span class="s2">;</span>
+
+            <span class="s1">Constructor contextConstructor</span><span class="s2">;</span>
+            try <span class="s1">{</span>
+                contextConstructor = clazz.getConstructor(JasperReportsContext.<span class="s2">class</span><span class="s1">)</span><span class="s2">;</span>
+            <span class="s1">} </span><span class="s2">catch </span><span class="s1">(NoSuchMethodException var7) {</span>
+                contextConstructor = <span class="s2">null;</span>
+            <span class="s1">}</span>
+
+            <span class="s2">if </span><span class="s1">(contextConstructor == </span><span class="s2">null</span><span class="s1">) {</span>
+                compiler = (JRCompiler)clazz.newInstance()<span class="s2">;</span>
+            <span class="s1">} </span><span class="s2">else </span><span class="s1">{</span>
+                compiler = (JRCompiler)contextConstructor.newInstance(<span class="s2">this</span><span class="s1">.jasperReportsContext)</span><span class="s2">;</span>
+            <span class="s1">}</span>
+
+            <span class="s2">return </span><span class="s1">compiler</span><span class="s2">;</span>
+        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(Exception var8) {</span>
+            <span class="s2">throw new </span><span class="s1">JRException(</span><span class="s3">&quot;engine.instantiate.report.compiler.failure&quot;</span><span class="s2">, new </span><span class="s1">Object[]{compilerClassName}</span><span class="s2">, </span><span class="s1">var8)</span><span class="s2">;</span>
+        <span class="s1">}</span>
+    }
+
+    <span class="s2">private </span><span class="s1">String getCompilerClassProperty() {</span>
+        <span class="s2">return </span><span class="s1">JRPropertiesUtil.getInstance(</span><span class="s2">this</span><span class="s1">.jasperReportsContext).getProperty(</span><span class="s3">&quot;net.sf.jasperreports.compiler.class&quot;</span><span class="s1">)</span><span class="s2">;</span>
+    <span class="s1">}</span>
+}
+</pre>
+</body>
+</html>
